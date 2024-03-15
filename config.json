@@ -1,0 +1,6 @@
+{
+    "uk_config": {"region": "uk_region", "app_name": "axm_uk", "schedule_interval": "0 0 * * *"},
+    "us_config": {"region": "us_region", "app_name": "axm_us", "schedule_interval": "0 0 * * *"},
+    "canada_config": {"region": "canada_region", "app_name": "axm_canada", "schedule_interval": "0 0 * * *"},
+    "canada_config_2": {"region": "canada_region_2", "app_name": "axm_canada_2", "schedule_interval": ""}
+}
