@@ -1,0 +1,10 @@
+#soonOutOfStockTable td {
+    background-color: rgb(255, 253, 143); /* Set the background color to light lemon */
+  }
+  #logo {
+    width: 60px; 
+    height: 30px; 
+    float: left; 
+    margin-right: 10px; 
+    border-radius: 30px;
+}

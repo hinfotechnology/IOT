@@ -1,0 +1,29 @@
+/* Portal buttons */
+.portal-button {
+    display: inline-block;
+    text-decoration: none;
+    background-color: #F2C98A;
+    color: #986923;
+    /* border: 1px solid #986923; */
+    border: 2px solid white;
+    padding: 10px 20px;
+    margin-right: 100px; /* Add right margin to separate the buttons */
+    margin-bottom: 10px;
+    border-radius: 50px;
+    width: 200px; /* Set a fixed width */
+    height: 50px; /* Set a fixed height */
+    transition: background-color 0.3s ease, transform 0.3s ease, filter 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* Hover effect */
+.portal-button:hover {
+    background-color: #986923;
+    color: #F2C98A;
+    transform: scale(1.1);
+    filter: brightness(0.8); /* Make the background image slightly darker on hover */
+}
