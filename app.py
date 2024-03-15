@@ -19,7 +19,7 @@ app.config['SECRET_KEY'] = 'hinfo@123'
 PASSWORD = 'Dhanu@123'
 WAREHOUSE = 'COMPUTE_WH'
 USER ='dhanu'
-ACCOUNT ='LDWIECU-WK50439'
+ACCOUNT ='FDNDCRV-CZ47175'
 DATABASE ='IOT'
 SCHEMA ='IOT'
 # IOT_env\Scripts\activate.bat
