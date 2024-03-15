@@ -22,6 +22,9 @@ USER ='dhanu'
 ACCOUNT ='FDNDCRV-CZ47175'
 DATABASE ='IOT'
 SCHEMA ='IOT'
+
+#to activate virtual envirnment execute below comment
+
 # IOT_env\Scripts\activate.bat
 
 conns = snowflake.connector.connect(
