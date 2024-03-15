@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"
+    <title>View Cart</title>
+    <link rel="shortcut icon" href="static\fevicons\purchaser_dashboard\hnfo.jpg" />
+</head>
+<body>
+    <h1>Shopping Cart</h1>
+    <table id="viewCartTable">
+        <tr>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Action</th>
+        </tr>
+        {% for item in cart_items %}
+        <tr>
+            <td>{{ item.product.name }}</td>
+            <td>${{ item.product.price }}</td>
+            <td>
+                <form method="POST" action="/update_cart">
+                    <input type="number" name="quantity_{{ item.product.id }}" value="{{ item.quantity }}" min="1">
+                    <input type="submit" value="Update">
+                </form>
+            </td>
+            <td>${{ item.product.price * item.quantity }}</td>
+            <td>
+                <a href="/delete_cart_item/{{ item.product.id }}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p>Total Price: ${{ total_price }}</p>
+    <a href="/product_details">Back to Product Details</a>
+    <script src="../static/js/add_cart.js"></script>
+
+</body>
+</html>
