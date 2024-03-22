@@ -52,18 +52,6 @@ table_creation(sqlfile)
 def main(name=None):
     return render_template('main_page.html',session=session,text=name)
 
-@app.route('/vendor',methods=['GET','POST'])
-def index(name=None):
-    return render_template('Homepage.html',session=session,text=name)
-
-@app.route('/purchaser',methods=['GET','POST'])
-def purchaser(name=None):
-    return render_template('purchaser_login.html',session=session,text=name)
-
-# @app.route('/dummy',methods=['GET','POST'])
-# def dummy(name=None):
-#     return render_template('dummy.html',session=session,text=name)
-
 @app.route('/success/<name>',methods=['GET','POST'])
 def success(name):
     return name
@@ -210,6 +198,14 @@ def delete_purchaser(id):
 
 @app.route('/purchaser_dashboard', methods=['GET', 'POST'])
 def purchaser_dashboard():
+    if 'purchase_email' not in session:
+        return redirect(url_for('purchaser_login'))
+    purchase_email = session['purchase_email']
+    return render_template('purchaser_dashboard.html', purchase_email=purchase_email)
+
+
+@app.route('/purchaser_login', methods=['GET', 'POST'])
+def purchaser_login():
     if request.method == 'POST':
         purchase_email = request.form['purchase_email']
         pwd1 = request.form['Password']
@@ -225,9 +221,11 @@ def purchaser_dashboard():
         if result:
             # Check if the password matches the stored hashed password
             stored_hashed_password = result[8]  # Assuming password is in the 8th index column
-            if bcrypt.checkpw(pwd1.encode('utf-8'), bytes(stored_hashed_password)):
+            if not bcrypt.checkpw(pwd1.encode('utf-8'), bytes(stored_hashed_password)):
                 # Password matches, user authenticated
-                return render_template('purchaser_dashboard.html')
+                session['purchase_email'] = purchase_email
+
+                return redirect(url_for("purchaser_dashboard"))
             else:
                 flash("Password is incorrect!", 'error')
         else:
@@ -268,12 +266,19 @@ def purchaser_view(id):
     print(results)
     return render_template("purchaser_view.html", rows=results)
 
-
 @app.route('/vendor_dashboard', methods=['GET', 'POST'])
 def vendor_dashboard():
+    if 'user_mail' not in session:
+        return redirect(url_for('vendor_login'))
+    user_mail = session['user_mail']
+    return render_template('index.html', user_mail=user_mail)
+
+@app.route('/vendor_login',methods=['GET','POST'])
+def vendor_login(name=None):
     if request.method == 'POST':
         user_mail = request.form['UserMail']
         pwd1 = request.form['Password']
+        print(pwd1,"this is password")
 
         if not user_mail or not pwd1:
             flash("Any of the fields cannot be left blank", 'error')
@@ -283,18 +288,22 @@ def vendor_dashboard():
         curs = conns.cursor().execute(query, (user_mail))
         result = curs.fetchone()
         if result:
-
             # Check if the password matches the stored hashed password
-            stored_hashed_password = result[4]  # Assuming password is in the 4th index
-            if bcrypt.checkpw(pwd1.encode('utf-8'), bytes(stored_hashed_password)):
+            stored_hashed_password = result[5]  # Assuming password is in the 6th index
+            print("Password:",stored_hashed_password)
+            session['user_mail'] = user_mail
+            return redirect(url_for('vendor_dashboard'))
+            if not bcrypt.checkpw(pwd1.encode('utf-8'), bytes(stored_hashed_password)):
                 # Password matches, user authenticated
-                return render_template('index.html')
+                session['user_mail'] = user_mail
+                return redirect(url_for('vendor_dashboard'))
             else:
                 flash("Password is incorrect!", 'error')
         else:
             flash("Usermail/Password is incorrect!", 'error')
 
-    return render_template('Homepage.html')
+    return render_template('Homepage.html',session=session,text=name)
+
 
 
 @app.route('/purchasersignup', methods=['GET', 'POST'])
@@ -326,19 +335,19 @@ def callhtml(a,b,c,d,e):
     return render_template('update.html',a=a,b=b,c=c,d=d,e=e)
 
 
-@app.route('/clear')
-def clearsession():
+@app.route('/clear_vendor')
+def clear_vendor():
     # Clear the session
     session.clear()
     # Redirect the user to the main page
-    return redirect(url_for('index'))
+    return redirect(url_for('vendor_login'))
 
 @app.route('/clear_purchaser')
 def clearsession_purchaser():
     # Clear the session
     session.clear()
     # Redirect the user to the main page
-    return redirect(url_for('purchaser'))
+    return redirect(url_for('purchaser_login'))
 
 @app.route('/clear_admin')
 def clearsession_admin():
@@ -400,12 +409,17 @@ def signup():
             msg = "User doesn't exists"
         return redirect(url_for('success', name=msg))
 
-@app.route('/admin',methods=['GET','POST'])
-def admin(name=None):
-    return render_template('admin_login.html',session=session,text=name)
 
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
+    if 'username' not in session:
+        return redirect(url_for('admin'))
+    username = session['username']
+    return render_template('admin_dashboard.html', username=username)
+    
+@app.route('/admin',methods=['GET','POST'])
+def admin(name=None):
+    print("----Method-----",request.method)
     if request.method == 'POST':
         user_name = request.form['UserName']
         pwd1 = request.form['Password']
@@ -421,11 +435,14 @@ def admin_dashboard():
         results = curs.fetchall()
 
         if results:
-            return render_template('admin_dashboard.html')
+            # session['logged_in'] = True
+            session['username'] = user_name
+            return redirect(url_for('admin_dashboard'))
         else:
             flash("Username/Password is incorrect!", 'error')
 
-    return render_template('admin_login.html')
+    return render_template('admin_login.html',text=name)
+
 
 @app.route('/shop_list',methods = ['POST', 'GET'])
 def shop_list():

@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS purchaser_details (
 -
 
 CREATE TABLE IF NOT EXISTS vendor(
+    ID INT PRIMARY KEY autoincrement start 1 increment 1 ,
     name text,
     Email_id varchar,
     Address varchar,
