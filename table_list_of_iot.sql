@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS purchaser_details (
 
 -
 
-CREATE TABLE IF NOT EXISTS vendor(
+CREATE TABLE IF NOT EXISTS vendor_details(
     ID INT PRIMARY KEY autoincrement start 1 increment 1 ,
     name text,
     Email_id varchar,
@@ -99,5 +99,3 @@ CREATE TABLE IF NOT EXISTS shop_list(
     shop_photo varchar
 );
 
-    
-    

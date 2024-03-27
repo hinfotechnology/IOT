@@ -205,20 +205,21 @@ def purchaser_dashboard():
 
 
 @app.route('/purchaser_login', methods=['GET', 'POST'])
-def purchaser_login():
+def purchaser_login(name=None):
+    print("method-------:",request.method)
     if request.method == 'POST':
         purchase_email = request.form['purchase_email']
         pwd1 = request.form['Password']
 
-        if not purchase_email or not pwd1:
-            flash("Any of the fields cannot be left blank", 'error')
-            return redirect(url_for('purchaser'))
+        print("mail----:",purchase_email)
+        print("password----:",pwd1)
 
         query = "SELECT * FROM purchaser_details WHERE Email_id = %s"
         curs = conns.cursor().execute(query, (purchase_email))
         result = curs.fetchone()
 
         if result:
+            print("------------------in page----------")
             # Check if the password matches the stored hashed password
             stored_hashed_password = result[8]  # Assuming password is in the 8th index column
             if not bcrypt.checkpw(pwd1.encode('utf-8'), bytes(stored_hashed_password)):
@@ -231,7 +232,7 @@ def purchaser_login():
         else:
             flash("Usermail/Password is incorrect!", 'error')
 
-    return render_template('purchaser_login.html')
+    return render_template('purchaser_login.html',text=name)
 
 
 
@@ -284,7 +285,7 @@ def vendor_login(name=None):
             flash("Any of the fields cannot be left blank", 'error')
             return redirect(url_for('admin'))
 
-        query = "SELECT * FROM vendor WHERE Email_id = %s"
+        query = "SELECT * FROM vendor_details WHERE Email_id = %s"
         curs = conns.cursor().execute(query, (user_mail))
         result = curs.fetchone()
         if result:
@@ -292,7 +293,7 @@ def vendor_login(name=None):
             stored_hashed_password = result[5]  # Assuming password is in the 6th index
             print("Password:",stored_hashed_password)
             session['user_mail'] = user_mail
-            return redirect(url_for('vendor_dashboard'))
+            # return redirect(url_for('vendor_dashboard'))
             if not bcrypt.checkpw(pwd1.encode('utf-8'), bytes(stored_hashed_password)):
                 # Password matches, user authenticated
                 session['user_mail'] = user_mail
@@ -334,6 +335,12 @@ def updateproducts():
 def callhtml(a,b,c,d,e):
     return render_template('update.html',a=a,b=b,c=c,d=d,e=e)
 
+@app.route('/clear')
+def clearsession():
+    # Clear the session
+    session.clear()
+    # Redirect the user to the main page
+    return redirect(url_for('index'))
 
 @app.route('/clear_vendor')
 def clear_vendor():
@@ -446,14 +453,14 @@ def admin(name=None):
 
 @app.route('/shop_list',methods = ['POST', 'GET'])
 def shop_list():
-    query = ("select * from shop_list")
+    query = ("select * from vendor_details")
     curs = conns.cursor().execute(query)
     query_id = curs.sfqid
     curs.get_results_from_sfqid(query_id)
     results = curs.fetchall()
     mytuple = sorted(results)
     print(results)
-    return render_template('shop_list.html',rows=mytuple)
+    return render_template('shop_list.html',rows=results)
 
 @app.route('/shop_view/<string:id>',methods = ['POST', 'GET'])
 def shop_view(id):
@@ -731,14 +738,14 @@ def create_vendor():
         else:
             # Check if email already exists
             curs = conns.cursor()
-            check_sql = "SELECT * FROM vendor WHERE Email_id = %s"
+            check_sql = "SELECT * FROM vendor_details WHERE Email_id = %s"
             curs.execute(check_sql, (email,))
             existing_customer = curs.fetchone()
 
             if existing_customer:
                 flash('Provided email already exists', 'error')
             else:
-                sql = "INSERT INTO vendor(name, Email_id, Address, Telephone, Password) VALUES (%s, %s, %s, %s, %s)"
+                sql = "INSERT INTO vendor_details(name, Email_id, Address, Telephone, Password) VALUES (%s, %s, %s, %s, %s)"
                 hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
                 value = (name, email, address, phone,hashed_password)
                 curs.execute(sql, value)
@@ -763,7 +770,7 @@ def create_vendor():
 
 @app.route('/vendor_details',methods = ['POST', 'GET'])
 def vendor_details():
-        query = ("select * from vendor")
+        query = ("select * from vendor_details")
         curs = conns.cursor().execute(query)
         query_id = curs.sfqid
         curs.get_results_from_sfqid(query_id)
@@ -778,7 +785,7 @@ def edit_vendor(id):
         address=request.form['address']
         phone=request.form['phone']
         curs=conns.cursor()
-        task = "update vendor set Name = %s, Email_id = %s,Address = %s,Telephone = %s WHERE vendor_Id = %s"
+        task = "update vendor_details set Name = %s, Email_id = %s,Address = %s,Telephone = %s WHERE vendor_Id = %s"
         value = (name,email,address,phone,id)
         curs = conns.cursor().execute(task,value)
         flash('vendor updated successfully','success')
@@ -786,7 +793,7 @@ def edit_vendor(id):
 
     if request.method=='GET':
         curs=conns.cursor()
-        sql="select * from vendor where vendor_Id= %s"
+        sql="select * from vendor_details where vendor_Id= %s"
         curs = conns.cursor().execute(sql,[id])
         results = curs.fetchone()
         print("---------------test-----------")
@@ -796,7 +803,7 @@ def edit_vendor(id):
 @app.route('/delete_vendor/<string:id>',methods = ['POST', 'GET'])
 def delete_vendor(id):
     curs=conns.cursor()
-    sql="delete from vendor where vendor_Id=%s"
+    sql="delete from vendor_details where vendor_Id=%s"
     curs = conns.cursor().execute(sql,[id])
     flash('vendor deleted successfully','success')
     return redirect(url_for("vendor_details"))
@@ -808,7 +815,7 @@ def reset_password():
         email = request.form['email']
         source = request.args.get('source')
         curs = conns.cursor()
-        check_vendor_sql = "SELECT * FROM vendor WHERE Email_id = %s"
+        check_vendor_sql = "SELECT * FROM vendor_details WHERE Email_id = %s"
         curs.execute(check_vendor_sql, (email,))
         vendor = curs.fetchone()
 
@@ -872,7 +879,7 @@ def reset_password_token(reset_token):
 
             if now <= expiration_timestamp:
                 # Check if the email exists in the vendor or customer table
-                check_vendor_sql = "SELECT * FROM vendor WHERE Email_id = %s"
+                check_vendor_sql = "SELECT * FROM vendor_details WHERE Email_id = %s"
                 curs.execute(check_vendor_sql, (email,))
                 vendor = curs.fetchone()
 
@@ -884,7 +891,7 @@ def reset_password_token(reset_token):
                     vendor_id = vendor[0]
                     hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
                     # Update the password in the vendor table
-                    update_vendor_password_sql = "UPDATE vendor SET Password = %s WHERE Vendor_ID = %s"
+                    update_vendor_password_sql = "UPDATE vendor_details SET Password = %s WHERE Vendor_ID = %s"
                     curs.execute(update_vendor_password_sql, (hashed_password, vendor_id))
 
                 if customer:

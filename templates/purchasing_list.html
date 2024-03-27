@@ -22,8 +22,38 @@
 	</head>
 	<!--end::Head-->
 	<!--begin::Body-->
+	{% if session['purchase_email'] %}
+
 	<body id="kt_body" style="background-image: url()" class="header-fixed aside-secondary-enabled">
 		<!--begin::Main-->
+		<style 
+					type="text/css">
+						.my_content_container a {
+							border-bottom: 1px solid #777777;
+							border-left: 1px solid #000000;
+							border-right: 1px solid #333333;
+							border-top: 1px solid #000000;
+							color: #000000;
+							display: block;
+							height: 2.5em;
+							padding: 1 5em;
+							width: 5em;       
+							text-decoration: none;
+							background-image: url('static/images/hinfo_logo.jpg'); /* Replace 'path_to_your_image.png' with the actual path to your image */
+							background-repeat: no-repeat;
+							background-position: center; /* Adjust the position of the image */
+							background-size: auto 100%; /* Adjust the size of the image */
+							padding-left: 30px; /* Adjust the padding to accommodate the width of the image */
+							line-height: 2.5em; /* Ensure vertical alignment */
+							position: absolute; /* Position the button absolutely */
+							top: 20px; /* Adjust top position */
+							left: 20px; /* Adjust left position */
+						}
+					</style>
+					
+					<div a&thinsp; class="my_content_container">
+						<a href="/purchaser_dashboard"></a>
+					</div>
 		<!--begin::Root-->
 		<div class="d-flex flex-column flex-root">
 			<!--begin::Page-->
@@ -3188,4 +3218,9 @@
 		<script src="static\js\purchasing_list.js"></script>
 	</body>
 	<!--end::Body-->
+	{% else %}
+		<h1>Please login again Your session was closed</h1>
+		<a href="{{ url_for('purchaser_login') }}" class="btn btn-bg-light btn-color-gray-600 btn-flex btn-active-color-primary flex-center w-100" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-trigger="hover" data-bs-offset="0,5" data-bs-dismiss-="click" title="200+ in-house components and 3rd-party plugins">
+		</a>
+	{% endif %}
 </html>
